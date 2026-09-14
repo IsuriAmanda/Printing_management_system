@@ -1,0 +1,244 @@
+<div class="jobs-page">
+
+  <div class="page-header">
+    <h2>Production Jobs</h2>
+  </div>
+
+  <div class="filter-bar">
+    <input
+      type="text"
+      placeholder="Search jobs..."
+      class="search-input"
+      [ngModel]="searchTerm()"
+      (ngModelChange)="searchTerm.set($event)">
+
+    <select
+      class="status-filter"
+      [ngModel]="statusFilter()"
+      (ngModelChange)="statusFilter.set($event)">
+      <option value="All">All Status</option>
+      <option *ngFor="let s of statuses; trackBy: trackByValue" [value]="s">{{ s }}</option>
+    </select>
+  </div>
+
+  <div *ngIf="isLoading()" class="loading">Loading jobs...</div>
+
+  <div class="table-wrapper" *ngIf="!isLoading()">
+    <table class="jobs-table">
+      <thead>
+        <tr>
+          <th>Job No</th>
+          <th>Job Name</th>
+          <th>Customer</th>
+          <th>Type</th>
+          <th>Qty</th>
+          <th>Priority</th>
+          <th>Status</th>
+          <th>Printing</th>
+          <th>Machine</th>
+          <th>Scheduled Date</th>
+          <th>Due Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let job of filteredJobs(); trackBy: trackByJobId">
+
+          <td>{{ job.job_number }}</td>
+
+          <td>{{ job.job_name }}</td>
+
+          <td>{{ job.customer_name || '—' }}</td>
+
+          <td>{{ job.job_type || '—' }}</td>
+
+          <td>{{ job.quantity || '—' }}</td>
+
+          <td>
+            <span [class]="'badge-priority ' + priorityClass(job.priority || '')">
+              {{ job.priority }}
+            </span>
+          </td>
+
+          <td>
+            <span [class]="'status-badge-readonly ' + statusClass(job.status || '')">
+              {{ job.status }}
+            </span>
+          </td>
+
+          <td>
+            <span class="print-state" [class.started]="printingState(job) === 'Printing started'">
+              {{ printingState(job) }}
+            </span>
+          </td>
+
+          <td>
+            <span class="machine-readonly">
+              {{ job.machine_name || 'Not assigned' }}
+            </span>
+          </td>
+
+          <td>{{ job.scheduled_date ? (job.scheduled_date | date:'dd MMM yyyy') : 'Not scheduled' }}</td>
+
+          <td>{{ job.due_date | date:'dd MMM yyyy' }}</td>
+
+          <td class="action-cell">
+            <a
+              *ngIf="job.quotation_id"
+              class="btn-view"
+              [routerLink]="['/jobs', job.job_id, 'quotation', job.quotation_id]">
+              View Quote
+            </a>
+            <button
+              type="button"
+              class="btn-edit"
+              [disabled]="!canEditPreStart(job)"
+              (click)="openEdit(job)">
+              Edit
+            </button>
+            <button type="button" class="btn-artwork" (click)="openArtwork(job)">Artwork</button>
+          </td>
+
+        </tr>
+
+        <tr *ngIf="filteredJobs().length === 0">
+          <td colspan="12" class="empty">No jobs found</td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+  <div class="modal-overlay" *ngIf="editingJob() as job">
+    <div class="modal-box edit-modal">
+      <div class="edit-modal-header">
+        <div>
+          <p class="modal-eyebrow">Pre-start job details</p>
+          <h3>{{ job.job_number }}</h3>
+        </div>
+        <button type="button" class="close-btn" (click)="closeEdit()" aria-label="Close edit job modal">&times;</button>
+      </div>
+
+      <div class="edit-modal-body">
+        <section class="edit-section">
+          <h4>Production</h4>
+          <div class="edit-grid">
+            <label class="field">
+              <span>Quantity</span>
+              <input type="number" class="cell-input" min="1" [(ngModel)]="editForm.quantity">
+            </label>
+
+            <label class="field">
+              <span>Material</span>
+              <select class="cell-select" [(ngModel)]="editForm.material_id">
+                <option [ngValue]="null">None</option>
+                <option *ngFor="let material of materials(); trackBy: trackBySupplyId" [ngValue]="material.sid">
+                  {{ material.name }}
+                </option>
+              </select>
+            </label>
+
+            <label class="field" *ngIf="isBook(job)">
+              <span>Binding</span>
+              <select class="cell-select" [(ngModel)]="editForm.binding_id">
+                <option [ngValue]="null">None</option>
+                <option *ngFor="let binding of bindingTypes(); trackBy: trackBySupplyId" [ngValue]="binding.sid">
+                  {{ binding.name }}
+                </option>
+              </select>
+            </label>
+          </div>
+        </section>
+
+        <section class="edit-section">
+          <div class="section-title-row">
+            <h4>Lamination</h4>
+            <span class="selected-note" *ngIf="selectedLaminationInfo()">{{ selectedLaminationInfo() }}</span>
+          </div>
+          <div class="radio-pills">
+            <label [class.selected]="selectedLaminationName() === 'none'">
+              <input
+                type="radio"
+                [checked]="selectedLaminationName() === 'none'"
+                (change)="onLaminationNameChange('none')">
+              <span>None</span>
+            </label>
+            <label
+              *ngFor="let name of uniqueLaminationNames(); trackBy: trackByValue"
+              [class.selected]="selectedLaminationName() === name">
+              <input
+                type="radio"
+                [checked]="selectedLaminationName() === name"
+                (change)="onLaminationNameChange(name)">
+              <span>{{ name }}</span>
+            </label>
+          </div>
+        </section>
+
+        <section class="edit-section">
+          <h4>Print Colors</h4>
+          <div class="edit-grid">
+            <label class="field">
+              <span>Front Pages</span>
+              <select class="cell-select" [(ngModel)]="editForm.front_color_pages">
+                <option *ngFor="let option of colorOptions()" [ngValue]="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span>Back Pages</span>
+              <select class="cell-select" [(ngModel)]="editForm.back_color_pages">
+                <option *ngFor="let option of colorOptions()" [ngValue]="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+            </label>
+
+            <label class="field" *ngIf="isBook(job)">
+              <span>Cover Front</span>
+              <select class="cell-select" [(ngModel)]="editForm.cover_front_color_pages">
+                <option *ngFor="let option of colorOptions()" [ngValue]="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+            </label>
+
+            <label class="field" *ngIf="isBook(job)">
+              <span>Cover Back</span>
+              <select class="cell-select" [(ngModel)]="editForm.cover_back_color_pages">
+                <option *ngFor="let option of colorOptions()" [ngValue]="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+            </label>
+          </div>
+        </section>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" (click)="closeEdit()">Cancel</button>
+        <button type="button" class="btn-save" (click)="savePreStartEdit()">
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" *ngIf="viewingArtworkJob()">
+    <div class="modal-box artwork-modal">
+      <div class="artwork-modal-header">
+        <h3>Artwork — {{ viewingArtworkJob()?.job_number }}</h3>
+        <button type="button" class="close-btn" (click)="closeArtwork()">✕</button>
+      </div>
+      <div class="artwork-list" *ngIf="viewingArtworkList().length > 0">
+        <div class="artwork-item" *ngFor="let a of viewingArtworkList(); trackBy: trackByArtworkId">
+          <a [href]="fileUrl(a.file_path)" target="_blank">{{ a.file_name }}</a>
+        </div>
+      </div>
+      <p *ngIf="viewingArtworkList().length === 0">No artwork uploaded for this job's quotation.</p>
+    </div>
+  </div>
+
+</div>

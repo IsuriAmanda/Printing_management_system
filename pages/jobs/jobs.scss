@@ -1,0 +1,204 @@
+.jobs-page {
+
+  background: #ece8ec;
+
+  padding: 20px;
+
+  border-radius: 8px;
+
+}
+
+/* HEADER */
+
+.page-header {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  margin-bottom: 16px;
+
+}
+
+.title {
+
+  font-size: 13px;
+
+  color: #555;
+
+}
+
+/* BUTTON */
+
+.green-btn {
+
+  background: #2d7a1f;
+
+  color: white;
+
+  border: none;
+
+  border-radius: 20px;
+
+  padding: 5px 16px;
+
+  font-size: 10px;
+
+  cursor: pointer;
+    &:hover {
+    background: #434c41;
+  }
+
+}
+
+/* FILTERS */
+
+.filter-bar {
+
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  max-width: 500px;
+
+}
+
+.filter-bar input,
+.filter-bar select {
+
+   height: 32px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 0 8px;
+    font-size: 12px;
+    background: #fff;
+    flex-grow: 1;
+    min-width: 0;
+
+    &:focus {
+      outline: none;
+      border-color: #2d7a1f;
+    }
+}
+
+.q-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  vertical-align: middle;
+
+  thead {
+    th {
+      background: #d9e3d5; // Light green brand table header
+      color: #333;
+      padding: 10px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      text-align: left;
+      border: 1px solid #c7d2c3;
+    }
+  }
+
+  tbody {
+    tr {
+      transition: background-color 0.15s ease;
+
+      &:hover {
+        background-color: #f9f8f9;
+      }
+
+      td {
+        padding: 10px 12px;
+        font-size: 12px;
+        color: #444;
+        border: 1px solid #e2dee2;
+      }
+    }
+  }
+
+  // Inline Form Controls inside table cells during Edit mode
+  .form-control-sm,
+  .form-select-sm {
+    height: 28px;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+
+    &:focus {
+      outline: none;
+      border-color: #2d7a1f;
+    }
+  }
+}
+
+// -- STATUS BADGES ------------------------------------
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 26px;
+  padding: 4px 10px;
+  border: 1px solid #dbe3df;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+
+
+  &.printing {
+    background: #dbe7ec;
+    color: #314d59;
+    border-color: #c4d6dd;
+  } 
+  &.cutting {
+    background: #e7e1ee;
+    color: #4f405c;
+    border-color: #d4c8df;
+  }
+  &.binding {
+    background: #f4ead8;
+    color: #674820;
+    border-color: #e8d8ba;
+  }
+  &.packing {
+    background: #e4f0e8;
+    color: #365b40;
+    border-color: #cbe1d3;
+  }
+  &.completed {
+    background: #dff2e5;
+    color: #23613a;
+    border-color: #c6e4d0;
+  } 
+
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 700px) {
+
+  .filter-bar {
+
+    flex-direction: column;
+    max-width: 100%;
+
+  }
+
+  .table-responsive {
+
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+
+  }
+
+}
