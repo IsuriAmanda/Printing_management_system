@@ -1,0 +1,147 @@
+.standard-sizes-page {
+  background: #ece8ec;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-size: 13px;
+  color: #555;
+}
+
+.green-btn {
+  background: #2d7a1f;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 5px 16px;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.filter-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.filter-bar input {
+  height: 28px;
+  border: none;
+  padding: 0 8px;
+  font-size: 11px;
+}
+
+.loading {
+  padding: 20px;
+  color: #777;
+  font-size: 12px;
+  text-align: center;
+}
+
+.q-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  vertical-align: middle;
+
+  thead {
+    th {
+      background: #d9e3d5;
+      color: #333;
+      padding: 10px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      text-align: left;
+      border: 1px solid #c7d2c3;
+    }
+  }
+
+  tbody {
+    tr {
+      transition: background-color 0.15s ease;
+
+      &:hover {
+        background-color: #f9f8f9;
+      }
+
+      td {
+        padding: 10px 12px;
+        font-size: 12px;
+        color: #444;
+        border: 1px solid #e2dee2;
+      }
+    }
+  }
+
+  .form-control-sm {
+    height: 28px;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+
+    &:focus {
+      outline: none;
+      border-color: #2d7a1f;
+    }
+  }
+}
+
+.unit-stack {
+  display: grid;
+  gap: 3px;
+  line-height: 1.25;
+
+  span {
+    white-space: nowrap;
+  }
+}
+
+.unit-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(72px, 1fr));
+  gap: 6px;
+
+  label {
+    display: grid;
+    gap: 3px;
+    margin: 0;
+    color: #555;
+    font-size: 10px;
+    font-weight: 600;
+  }
+}
+
+@media (max-width: 700px) {
+  .standard-sizes-page {
+    padding: 14px;
+  }
+
+  .page-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .filter-bar {
+    flex-direction: column;
+  }
+
+  .table-responsive {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}

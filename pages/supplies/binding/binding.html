@@ -1,0 +1,110 @@
+<div class="Binding-page">
+  <div class="page-header">
+    <div class="title">Binding Types</div>
+    <button class="green-btn" (click)="addNewBindingType()">
+      + Add Binding Type
+    </button>
+  </div>
+
+  <div class="filter-bar">
+    <input
+      type="text"
+      class="search-input"
+      placeholder="Search..."
+      [ngModel]="searchTerm()"
+      (ngModelChange)="searchTerm.set($event)" />
+  </div>
+
+  <div class="table-responsive">
+    <table class="table q-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Binding Name</th>
+          <th>Min Pages</th>
+          <th>Max Pages</th>
+          <th>Price (LKR)</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="isLoading">
+          <td colspan="6" class="text-center text-muted">Loading...</td>
+        </tr>
+        <tr *ngIf="!isLoading && filtered().length === 0 && editRowId() !== 0">
+          <td colspan="6" class="text-center text-muted">No binding types found.</td>
+        </tr>
+
+        <tr *ngIf="editRowId() === 0">
+          <td>New</td>
+          <td><input class="form-control form-control-sm" [(ngModel)]="editCache.name" placeholder="Binding name"></td>
+          <td><input type="number" min="1" step="1" class="form-control form-control-sm" [(ngModel)]="editCache.min_pages" placeholder="Min pages"></td>
+          <td><input type="number" min="1" step="1" class="form-control form-control-sm" [(ngModel)]="editCache.max_pages" placeholder="Max pages"></td>
+          <td><input type="number" min="0.01" step="0.01" class="form-control form-control-sm" [(ngModel)]="editCache.price" placeholder="Price"></td>
+          <td><div class="d-flex gap-1">
+            <button class="btn btn-sm btn-success" (click)="saveEdit(0)" [disabled]="isSaving() === 0">Save</button>
+            <button class="btn btn-sm btn-outline-secondary" (click)="cancelEdit()">Cancel</button>
+          </div></td>
+        </tr>
+
+        <tr *ngFor="let s of filtered(); trackBy: trackBySupplyId">
+          <td>{{ s.sid }}</td>
+
+          <td>
+            <ng-container *ngIf="editRowId() !== s.sid; else editName">
+              <strong>{{ s.name }}</strong>
+            </ng-container>
+            <ng-template #editName>
+              <input class="form-control form-control-sm" [(ngModel)]="editCache.name">
+            </ng-template>
+          </td>
+
+          <td>
+            <ng-container *ngIf="editRowId() !== s.sid; else editMin">
+              {{ s.min_pages }}
+            </ng-container>
+            <ng-template #editMin>
+              <input type="number" min="1" step="1" class="form-control form-control-sm" [(ngModel)]="editCache.min_pages">
+            </ng-template>
+          </td>
+
+          <td>
+            <ng-container *ngIf="editRowId() !== s.sid; else editMax">
+              {{ s.max_pages }}
+            </ng-container>
+            <ng-template #editMax>
+              <input type="number" min="1" step="1" class="form-control form-control-sm" [(ngModel)]="editCache.max_pages">
+            </ng-template>
+          </td>
+
+          <td>
+            <ng-container *ngIf="editRowId() !== s.sid; else editPrice">
+              {{ s.price | currency:'LKR ' }}
+            </ng-container>
+            <ng-template #editPrice>
+              <input type="number" min="0.01" step="0.01" class="form-control form-control-sm" [(ngModel)]="editCache.price">
+            </ng-template>
+          </td>
+
+          <td>
+            <div class="d-flex gap-1">
+              <ng-container *ngIf="editRowId() !== s.sid">
+                <button class="btn btn-sm btn-secondary" (click)="startEdit(s)">Edit</button>
+                <button class="btn btn-sm btn-danger"    (click)="delete(s.sid)">Delete</button>
+              </ng-container>
+              <ng-container *ngIf="editRowId() === s.sid">
+                <button
+                  class="btn btn-sm btn-success"
+                  (click)="saveEdit(s.sid)"
+                  [disabled]="isSaving() === s.sid">
+                  {{ isSaving() === s.sid ? 'Saving...' : 'Save' }}
+                </button>
+                <button class="btn btn-sm btn-outline-secondary" (click)="cancelEdit()">Cancel</button>
+              </ng-container>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
