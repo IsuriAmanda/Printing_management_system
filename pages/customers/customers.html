@@ -1,0 +1,124 @@
+<div class="customer-page">
+  
+  <div class="page-header">
+    <div>
+      <div class="title">Customer Management</div>
+    </div>
+    <button class="green-btn" (click)="addNewCustomerRow()">
+      + Add Customer
+    </button>
+  </div>
+
+  <div class="filter-bar">
+    <input
+      type="text"
+      placeholder="Search name, email or phone..."
+      [ngModel]="searchQuery()"
+      (ngModelChange)="searchQuery.set($event)" />
+
+    <select [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event)">
+      <option value="">All Statuses</option>
+      <option value="Active">Active</option>
+      <option value="Inactive">Inactive</option>
+      <option value="Lead">Lead</option>
+    </select>
+  </div>
+
+  <div class="table-responsive">
+    <table class="q-table">
+      <thead>
+        <tr>
+          <th style="width: 70px;">ID</th>
+          <th>Customer Identity Name</th>
+          <th>Email Address</th>
+          <th>Contact Number</th>
+          <th>Physical Address</th> <th style="width: 130px;">Status</th>
+          <th style="width: 150px; text-align: center;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="isNewRow && editRowId() === 0">
+          <td><strong>New</strong></td>
+          <td><input class="form-control-sm" [(ngModel)]="editCache.name" placeholder="Full Name" style="width: 100%;" /></td>
+          <td><input class="form-control-sm" [(ngModel)]="editCache.email" placeholder="Email" style="width: 100%;" /></td>
+          <td><input class="form-control-sm" [(ngModel)]="editCache.phone" placeholder="Phone" style="width: 100%;" /></td>
+          <td><input class="form-control-sm" [(ngModel)]="editCache.address" placeholder="Address" style="width: 100%;" /></td>
+           <td>
+            <select class="form-select-sm" [(ngModel)]="editCache.status">
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+              <option value="Lead">Lead</option>
+            </select>
+          </td>
+          <td>
+            <div class="action-btn-container">
+              <button class="action-btn save-btn" (click)="saveEdit(0)">Save</button>
+              <button class="action-btn cancel-btn" (click)="cancelEdit()">Cancel</button>
+            </div>
+          </td>
+        </tr>
+
+        <tr *ngIf="filtered().length === 0 && !isNewRow">
+          <td colspan="7" style="text-align: center; color: #888; padding: 20px;">
+            No customer profiles found matching filters.
+          </td>
+        </tr>
+
+        <tr *ngFor="let c of filtered(); trackBy: trackById">
+          <td><strong>{{ c.customer_id }}</strong></td>
+
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <span class="avatar-circle" [ngClass]="avatarClass(c.customer_id)">{{ initials(c) }}</span>
+              <ng-container *ngIf="editRowId() !== c.customer_id; else editName">{{ c.name }}</ng-container>
+              <ng-template #editName><input class="form-control-sm" [(ngModel)]="editCache.name" style="width: 100%;" /></ng-template>
+            </div>
+          </td>
+
+          <td>
+            <ng-container *ngIf="editRowId() !== c.customer_id; else editEmail">{{ c.email }}</ng-container>
+            <ng-template #editEmail><input class="form-control-sm" [(ngModel)]="editCache.email" style="width: 100%;" /></ng-template>
+          </td>
+
+          <td>
+            <ng-container *ngIf="editRowId() !== c.customer_id; else editPhone">{{ c.phone }}</ng-container>
+            <ng-template #editPhone><input class="form-control-sm" [(ngModel)]="editCache.phone" style="width: 100%;" /></ng-template>
+          </td>
+
+          <td>
+            <ng-container *ngIf="editRowId() !== c.customer_id; else editAddress">{{ c.address }}</ng-container>
+            <ng-template #editAddress><input class="form-control-sm" [(ngModel)]="editCache.address" style="width: 100%;" /></ng-template>
+          </td>
+
+          <td>
+            <ng-container *ngIf="editRowId() !== c.customer_id; else editStatus">
+              <span class="badge" [ngClass]="(c.status || 'Active').toLowerCase()">
+                {{ c.status || 'Active' }}
+              </span>
+            </ng-container>
+            <ng-template #editStatus>
+              <select class="form-select-sm" [(ngModel)]="editCache.status">
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+                <option value="Lead">Lead</option>
+              </select>
+            </ng-template>
+          </td>
+
+          <td>
+            <div class="action-btn-container" *ngIf="editRowId() !== c.customer_id; else editingActions">
+              <button class="action-btn edit-btn" (click)="startEdit(c)">Edit</button>
+              
+            </div>
+            <ng-template #editingActions>
+              <div class="action-btn-container">
+                <button class="action-btn save-btn" (click)="saveEdit(c.customer_id)">Save</button>
+                <button class="action-btn cancel-btn" (click)="cancelEdit()">Cancel</button>
+              </div>
+            </ng-template>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
