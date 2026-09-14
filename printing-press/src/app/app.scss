@@ -1,0 +1,14 @@
+.dashboard-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow);
+}
+
+.dashboard-title {
+  margin: 0 0 14px;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 700;
+}
