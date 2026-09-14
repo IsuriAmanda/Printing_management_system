@@ -1,0 +1,189 @@
+<mat-sidenav-container class="sidenav-container">
+
+  <!-- ======================================================
+       SIDEBAR
+  ====================================================== -->
+
+  <mat-sidenav
+    #drawer
+class="sidenav"
+  [fixedInViewport]="(isHandset$ | async) ? true : false"
+  [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+  [mode]="(isHandset$ | async) ? 'over' : 'side'"
+   [opened]="!(isHandset$ | async)"
+  autoFocus="false"
+  disableClose="false">
+
+    <!-- Brand header -->
+    <div class="sidebar-header">
+      <mat-icon class="sidebar-logo-icon">local_printshop</mat-icon>
+      <span>PRINTING PRESS</span>
+    </div>
+
+    <!-- -- MOBILE: full menu -------------------------------- -->
+    <mat-nav-list *ngIf="isHandset$ | async" class="mobile-nav">
+      <ng-container *ngFor="let item of allMenuItems(); trackBy: trackByLink">
+
+        <!-- Section heading -->
+        <div *ngIf="item.isHeader" class="sidebar-section-header">
+          {{ item.name }}
+        </div>
+
+        <!-- Nav link -->
+        <a
+          *ngIf="!item.isHeader"
+          mat-list-item
+          [routerLink]="item.link"
+          routerLinkActive="active-sidebar"
+          [routerLinkActiveOptions]="{ exact: item.link === '/' }"
+          (click)="closeDrawer()">
+          <mat-icon matListItemIcon *ngIf="item.icon">{{ item.icon }}</mat-icon>
+          <span matListItemTitle>{{ item.name }}</span>
+        </a>
+
+      </ng-container>
+    </mat-nav-list>
+
+    <!-- -- DESKTOP: active-module items only --------------- -->
+    <mat-nav-list *ngIf="!(isHandset$ | async)">
+      <a
+        mat-list-item
+        *ngFor="let item of menuItems(); trackBy: trackByLink"
+        [routerLink]="item.link"
+        routerLinkActive="active-sidebar"
+        [routerLinkActiveOptions]="{ exact: item.link === '/' }">
+        <mat-icon matListItemIcon *ngIf="item.icon">{{ item.icon }}</mat-icon>
+        <span matListItemTitle>{{ item.name }}</span>
+      </a>
+    </mat-nav-list>
+
+  </mat-sidenav>
+
+  <!-- ======================================================
+       MAIN CONTENT
+  ====================================================== -->
+
+  <mat-sidenav-content>
+
+    <!-- -- TOP NAVBAR ------------------------------------ -->
+    <mat-toolbar class="topbar" role="banner">
+
+      <!-- Hamburger (mobile only) -->
+      <button
+        *ngIf="isHandset$ | async"
+        mat-icon-button
+        class="menu-btn"
+        type="button"
+        aria-label="Toggle navigation menu"
+        (click)="toggleDrawer()">
+        <mat-icon>menu</mat-icon>
+      </button>
+
+      <!-- Brand -->
+      <span class="title" aria-label="Harshana Printers">Harshana Printers</span>
+
+      <span class="spacer"></span>
+
+      <!-- Desktop top nav links -->
+      <nav aria-label="Main navigation" class="top-nav">
+        <ng-container *ngFor="let link of topNavLinks()">
+
+  <a
+    *ngIf="
+      link.name !== 'Users'
+      ||
+      currentUser()?.role === 'Admin'
+    "
+
+    mat-button
+
+    class="nav-link"
+
+    [routerLink]="link.link"
+
+    routerLinkActive="active-nav"
+
+    [routerLinkActiveOptions]="{
+      exact: link.exact
+    }">
+
+    {{ link.name }}
+
+  </a>
+
+</ng-container>
+      </nav>
+
+      <!-- Notifications -->
+      <div class="notification-wrapper">
+        <button
+          mat-icon-button
+          class="icon-btn"
+          aria-label="Notifications"
+          [matTooltip]="unreadCount ? unreadCount + ' unread notifications' : 'No new notifications'"
+          (click)="toggleNotifications()">
+          <mat-icon>notifications</mat-icon>
+          <span
+            class="badge"
+            *ngIf="unreadCount > 0"
+            aria-label="{{ unreadCount }} unread">
+            {{ unreadCount > 9 ? '9+' : unreadCount }}
+          </span>
+        </button>
+
+        <!-- Notification dropdown -->
+        <div class="notification-panel" *ngIf="showNotifications" role="region" aria-label="Notifications">
+          <div class="notification-panel-header">
+            <span>Notifications</span>
+            <button mat-button class="mark-read-btn" (click)="toggleNotifications()">Close</button>
+          </div>
+          <mat-divider></mat-divider>
+<div
+  class="notification-item"
+  *ngFor="let n of notifications(); trackBy: trackByNotificationId"
+  [class.unread]="!n.is_read">
+  <mat-icon class="notif-icon">info_outline</mat-icon>
+  <span>{{ n.message }}</span>
+</div>
+<div class="notification-empty" *ngIf="notifications().length === 0">
+  No notifications
+</div>
+        </div>
+      </div>
+
+      <!-- User Menu -->
+      <button
+        mat-icon-button
+        class="icon-btn"
+        aria-label="User account menu"
+        matTooltip="Account"
+        [matMenuTriggerFor]="userMenu">
+        <mat-icon>account_circle</mat-icon>
+      </button>
+
+<mat-menu #userMenu="matMenu" xPosition="before">
+  <a mat-menu-item routerLink="/profile">
+    <mat-icon>person</mat-icon>
+    <span>Profile</span>
+  </a>
+  <a mat-menu-item routerLink="/settings">
+    <mat-icon>settings</mat-icon>
+    <span>Settings</span>
+  </a>
+  <mat-divider></mat-divider>
+  <button mat-menu-item class="logout-item" (click)="logout()">
+    <mat-icon>logout</mat-icon>
+    <span>Logout</span>
+  </button>
+</mat-menu>
+
+    </mat-toolbar>
+
+    <!-- -- PAGE CONTENT ----------------------------------- -->
+    <main class="page-content">
+      <router-outlet></router-outlet>
+    </main>
+
+  </mat-sidenav-content>
+
+</mat-sidenav-container>
