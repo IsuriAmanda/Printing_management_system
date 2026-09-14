@@ -1,0 +1,181 @@
+<div class="q-page">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <h2 class="page-title">Quotation History</h2>
+    <button class="btn-create" (click)="openCreateDialog()">
+      + Create Quote
+    </button>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filter-bar">
+    <input
+      type="text"
+      class="search-input"
+      placeholder="Search quotations..."
+      [ngModel]="searchTerm()"
+      (ngModelChange)="searchTerm.set($event)" />
+
+    <select
+      class="filter-select"
+      [ngModel]="selectedStatus()"
+      (ngModelChange)="selectedStatus.set($event)">
+      <option value="All Status">All Status</option>
+      <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
+    </select>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrap">
+    <table class="q-table">
+      <thead>
+        <tr>
+          <th>Quote ID</th>
+          <th>Job Name</th>
+          <th>Customer</th>
+          <th>Date</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <tr *ngIf="filtered().length === 0">
+          <td colspan="7" class="empty-row">No quotations found.</td>
+        </tr>
+
+        <tr *ngFor="let q of filtered(); trackBy: trackById"
+          [class.row-converted]="isConverted(q)">
+
+          <!-- ID -->
+          <td class="cell-id">{{ q.id }}</td>
+
+          <!-- JOB NAME -->
+          <td>{{ q.job_name || '—' }}</td>
+
+          <!-- CUSTOMER -->
+          <td>{{ q.customer_name }}</td>
+
+          <!-- DATE -->
+          <td>{{ q.dateCreated | date:'dd MMM yyyy' }}</td>
+
+          <!-- TOTAL -->
+          <td>LKR {{ q.total_cost | number:'1.2-2' }}</td>
+
+          <!-- STATUS -->
+          <td>
+            <select
+              [class]="'cell-select badge ' + statusClass(q.status)"
+              [ngModel]="q.status"
+              (ngModelChange)="onStatusChange(q, $event)"
+              [disabled]="isConverted(q)">
+              <option *ngFor="let s of statusOptions" [value]="s">
+                {{ s }}
+              </option>
+            </select>
+          </td>
+
+          <!-- ACTIONS -->
+          <td>
+            <div class="action-btns">
+
+              <!-- Edit — navigates to full form, locked if converted -->
+              <button
+                type="button"
+                class="btn-edit"
+                (click)="editQuotation(q)"
+                [disabled]="isConverted(q)"
+                [title]="isConverted(q) ? 'Cannot edit — already converted to job' : 'Edit quotation'">
+                Edit
+              </button>
+
+              <!-- Delete -->
+              <button
+                type="button"
+                class="btn-delete"
+                (click)="delete(q.id!)"
+                [disabled]="isConverted(q)">
+                Delete
+              </button>
+
+              <!-- Email -->
+              <button
+                type="button"
+                class="btn-email"
+                (click)="sendEmail(q)"
+                [disabled]="sendingEmailId() === q.id">
+                {{ sendingEmailId() === q.id ? 'Sending...' : 'Email' }}
+              </button>
+
+              <!-- Convert to Job — only for CONFIRMED, not yet converted -->
+              <ng-container *ngIf="q.status === 'CONFIRMED'">
+                <button
+                  *ngIf="!isConverted(q)"
+                  type="button"
+                  class="btn-convert"
+                  (click)="openConvertForm(q)">
+                  → Create Job
+                </button>
+                <span
+                  *ngIf="isConverted(q)"
+                  class="badge-converted"
+                  title="Converted to production job">
+                  ✓ Converted to Job
+                </span>
+              </ng-container>
+
+              <!-- PDF -->
+              <button
+                type="button"
+                class="pdf-btn"
+                (click)="downloadPdf(q)"
+                [disabled]="downloadingPdfId() === q.id">
+                {{ downloadingPdfId() === q.id ? 'Downloading...' : 'PDF' }}
+              </button>
+
+            </div>
+          </td>
+
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+  <!-- CONVERT MODAL -->
+  <div class="modal-overlay" *ngIf="showConvertForm()">
+    <div class="convert-modal">
+
+      <div class="convert-header">
+        <h3>Convert to Job Ticket</h3>
+        <button type="button" class="btn-close-x" (click)="closeConvertForm()">✕</button>
+      </div>
+
+      <p class="convert-sub">
+        Quotation #{{ convertingId() }} will be converted to a production job ticket.
+      </p>
+
+      <div class="convert-row">
+        <label>Due Date <span class="req">*</span></label>
+        <input
+          type="date"
+          [min]="todayDate"
+          [ngModel]="convertDueDate()"
+          (ngModelChange)="convertDueDate.set($event)">
+      </div>
+
+      <div class="convert-actions">
+        <button type="button" class="btn-cancel" (click)="closeConvertForm()">
+          Cancel
+        </button>
+        <button type="button" class="btn-convert-confirm" (click)="confirmConvert()">
+          Create Job Ticket
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>

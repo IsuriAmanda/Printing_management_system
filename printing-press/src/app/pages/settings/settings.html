@@ -1,0 +1,20 @@
+<div class="settings-page">
+  <div class="page-header">
+    <h2>Account Settings</h2>
+  </div>
+
+  <div class="form-card">
+    <h3>Change Password</h3>
+    <p class="success-box" *ngIf="message()">{{ message() }}</p>
+    <p class="error-box" *ngIf="error()">{{ error() }}</p>
+
+    <form [formGroup]="form" (ngSubmit)="save()">
+      <label>Current Password <input type="password" formControlName="currentPassword"></label>
+      <label>New Password <input type="password" formControlName="newPassword"></label>
+      <label>Confirm New Password <input type="password" formControlName="confirmPassword"></label>
+      <button type="submit" class="primary-btn" [disabled]="saving()">
+        {{ saving() ? 'Updating...' : 'Change Password' }}
+      </button>
+    </form>
+  </div>
+</div>

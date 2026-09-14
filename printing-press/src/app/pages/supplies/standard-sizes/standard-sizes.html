@@ -1,0 +1,166 @@
+<div class="standard-sizes-page">
+
+  <div class="page-header">
+    <div class="title">Standard Sizes</div>
+    <button
+      type="button"
+      class="green-btn"
+      (click)="addNewStandard()">
+      + Add Standard Size
+    </button>
+  </div>
+
+  <div class="filter-bar">
+    <input
+      type="text"
+      class="search-input"
+      placeholder="Search size ID/name"
+      [ngModel]="searchTerm()"
+      (ngModelChange)="searchTerm.set($event)" />
+  </div>
+
+  <div *ngIf="isLoading()" class="loading">Loading standard sizes...</div>
+
+  <div class="table-responsive" *ngIf="!isLoading()">
+    <table class="table table-striped table-bordered q-table">
+      <thead>
+        <tr>
+          <th>Size ID</th>
+          <th>Size Name</th>
+          <th>Height</th>
+          <th>Width</th>
+          <th style="width: 180px;">Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngIf="filteredStandards().length === 0 && editStandardId() !== 0">
+          <td colspan="5" class="text-center text-muted">No standard sizes found.</td>
+        </tr>
+
+        <tr *ngIf="editStandardId() === 0">
+          <td>New</td>
+          <td><input class="form-control form-control-sm" [(ngModel)]="standardEditCache.size_name" placeholder="Size name"></td>
+          <td><input type="number" min="0.01" step="0.01" class="form-control form-control-sm"
+            [(ngModel)]="standardEditCache.height" placeholder="Height (in)"></td>
+          <td><input type="number" min="0.01" step="0.01" class="form-control form-control-sm"
+            [(ngModel)]="standardEditCache.width" placeholder="Width (in)"></td>
+          <td>
+            <div class="d-flex gap-1">
+              <button class="btn btn-sm btn-success" [disabled]="isSaving() === 0" (click)="saveStandard(0)">Save</button>
+              <button class="btn btn-sm btn-outline-secondary" (click)="cancelStandardEdit()">Cancel</button>
+            </div>
+          </td>
+        </tr>
+
+        <tr *ngFor="let standard of filteredStandards(); trackBy: trackByStandardId">
+          <td>{{ standard.size_id }}</td>
+
+          <td>
+            <ng-container *ngIf="editStandardId() !== standard.size_id; else editStandardName">
+              {{ standard.size_name }}
+            </ng-container>
+            <ng-template #editStandardName>
+              <input class="form-control form-control-sm" [(ngModel)]="standardEditCache.size_name">
+            </ng-template>
+          </td>
+
+          <td>
+            <ng-container *ngIf="editStandardId() !== standard.size_id; else editStandardHeight">
+              <div class="unit-stack">
+                <span>{{ displayNumber(standard.height) }} in</span>
+                <span>{{ displayNumber(toCm(standard.height)) }} cm</span>
+                <span>{{ displayNumber(toMm(standard.height)) }} mm</span>
+              </div>
+            </ng-container>
+            <ng-template #editStandardHeight>
+              <div class="unit-edit-grid">
+                <label>in
+                  <input
+                    type="number"
+                    class="form-control form-control-sm"
+                    [ngModel]="standardEditCache.height"
+                    (ngModelChange)="setStandardDimension('height', $event, 'in')">
+                </label>
+                <label>cm
+                  <input
+                    type="number"
+                    class="form-control form-control-sm"
+                    [ngModel]="toCm(standardEditCache.height)"
+                    (ngModelChange)="setStandardDimension('height', $event, 'cm')">
+                </label>
+                <label>mm
+                  <input
+                    type="number"
+                    class="form-control form-control-sm"
+                    [ngModel]="toMm(standardEditCache.height)"
+                    (ngModelChange)="setStandardDimension('height', $event, 'mm')">
+                </label>
+              </div>
+            </ng-template>
+          </td>
+
+          <td>
+            <ng-container *ngIf="editStandardId() !== standard.size_id; else editStandardWidth">
+              <div class="unit-stack">
+                <span>{{ displayNumber(standard.width) }} in</span>
+                <span>{{ displayNumber(toCm(standard.width)) }} cm</span>
+                <span>{{ displayNumber(toMm(standard.width)) }} mm</span>
+              </div>
+            </ng-container>
+            <ng-template #editStandardWidth>
+              <div class="unit-edit-grid">
+                <label>in
+                  <input
+                    type="number"
+                    class="form-control form-control-sm"
+                    [ngModel]="standardEditCache.width"
+                    (ngModelChange)="setStandardDimension('width', $event, 'in')">
+                </label>
+                <label>cm
+                  <input
+                    type="number"
+                    class="form-control form-control-sm"
+                    [ngModel]="toCm(standardEditCache.width)"
+                    (ngModelChange)="setStandardDimension('width', $event, 'cm')">
+                </label>
+                <label>mm
+                  <input
+                    type="number"
+                    class="form-control form-control-sm"
+                    [ngModel]="toMm(standardEditCache.width)"
+                    (ngModelChange)="setStandardDimension('width', $event, 'mm')">
+                </label>
+              </div>
+            </ng-template>
+          </td>
+
+          <td>
+            <div class="d-flex gap-1">
+              <ng-container *ngIf="editStandardId() !== standard.size_id">
+                <button class="btn btn-sm btn-secondary" (click)="startStandardEdit(standard)">
+                  Edit
+                </button>
+                <button class="btn btn-sm btn-danger" (click)="deleteStandard(standard.size_id)">
+                  Delete
+                </button>
+              </ng-container>
+
+              <ng-container *ngIf="editStandardId() === standard.size_id">
+                <button
+                  class="btn btn-sm btn-success"
+                  [disabled]="isSaving() === standard.size_id"
+                  (click)="saveStandard(standard.size_id)">
+                  {{ isSaving() === standard.size_id ? 'Saving...' : 'Save' }}
+                </button>
+                <button class="btn btn-sm btn-outline-secondary" (click)="cancelStandardEdit()">
+                  Cancel
+                </button>
+              </ng-container>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,33 @@
+<div class="user-details-page">
+  <p *ngIf="loading()">Loading...</p>
+  <p class="error-box" *ngIf="error()">{{ error() }}</p>
+
+  <ng-container *ngIf="user() as u">
+    <div class="page-header">
+      <div>
+        <a routerLink="/users" class="back-link">User Management</a>
+        <h1>{{ u.full_name }}</h1>
+        <p>{{ u.role_name }}</p>
+      </div>
+      <a [routerLink]="['/users/edit', u.id]" class="primary-btn">Edit User</a>
+    </div>
+
+    <div class="details-grid">
+      <section class="profile-card">
+        <div class="avatar">{{ u.full_name.charAt(0) }}</div>
+        <h2>{{ u.full_name }}</h2>
+        <span class="status">{{ u.is_active ? 'Active' : 'Inactive' }}</span>
+      </section>
+
+      <section class="info-card">
+        <h2>Account Details</h2>
+        <div class="info-grid">
+          <span>User ID</span><strong>{{ u.id }}</strong>
+          <span>Email</span><strong>{{ u.email }}</strong>
+          <span>Role</span><strong>{{ u.role_name }}</strong>
+          <span>Created</span><strong>{{ u.created_at | date:'medium' }}</strong>
+        </div>
+      </section>
+    </div>
+  </ng-container>
+</div>

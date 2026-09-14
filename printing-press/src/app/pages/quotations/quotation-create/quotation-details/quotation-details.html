@@ -1,0 +1,418 @@
+<div class="quotation-page">
+  <h2 class="page-title">Quotation Details</h2>
+
+  <div *ngIf="isLoading" class="loading-state">Loading quotation details...</div>
+
+  <div *ngIf="!isLoading" class="form-card" [class.view-mode]="isViewMode">
+
+    <div class="quotation-meta">
+      <span>Quotation No: <strong>{{ quotation?.id || 'New' }}</strong></span>
+      <span>Customer: <strong>{{ quotation?.customer_name }}</strong></span>
+    </div>
+
+    <div class="card-body">
+
+      <!-- ── LEFT: Form ──────────────────────────────────── -->
+      <div class="form-fields">
+        <form [formGroup]="form">
+
+          <div class="row">
+            <label>Job Name</label>
+            <input type="text" formControlName="jobName"
+              [readonly]="isViewMode" placeholder="Enter job name">
+          </div>
+
+          <div class="row">
+            <label>Job Type</label>
+            <select formControlName="jobType"
+              [attr.disabled]="isViewMode ? true : null"
+              (change)="onJobTypeChange($any($event.target).value)">
+              <option value="">Select</option>
+              <option value="book">Book</option>
+              <option value="leaflet">Leaflet</option>
+            </select>
+          </div>
+
+          <div class="row">
+            <label>{{ form.get('jobType')?.value === 'book' ? 'No. of Books' : form.get('jobType')?.value === 'leaflet' ? 'No. of Leaflets' : 'Quantity' }}</label>
+            <input type="number" formControlName="jobQty"
+              [readonly]="isViewMode" min="1" placeholder="0">
+          </div>
+
+          <div class="row" *ngIf="form.get('jobType')?.value === 'book'">
+            <label>No. of Pages per Book</label>
+            <input type="number" formControlName="pagesQty"
+              [readonly]="isViewMode" min="1" step="1" placeholder="e.g. 24">
+          </div>
+
+          <!-- JOB SIZE -->
+          <div class="section-label">Job Size</div>
+
+          <div class="row size-controls" *ngIf="!isViewMode">
+            <label>Unit</label>
+            <div class="unit-toggle">
+              <button type="button" [class.active]="form.get('sizeUnit')?.value === 'mm'"
+                (click)="onUnitChange('mm')">mm</button>
+              <button type="button" [class.active]="form.get('sizeUnit')?.value === 'cm'"
+                (click)="onUnitChange('cm')">cm</button>
+              <button type="button" [class.active]="form.get('sizeUnit')?.value === 'in'"
+                (click)="onUnitChange('in')">in</button>
+            </div>
+          </div>
+
+          <div class="row" *ngIf="!isViewMode">
+            <label>Standard Size</label>
+            <select formControlName="standardSizeId"
+              (change)="onStandardSizeChange($any($event.target).value)">
+              <option value="">Custom size</option>
+              <option *ngFor="let s of standards" [value]="s.size_id">
+                {{ s.size_name }} ({{ s.width }}" × {{ s.height }}")
+              </option>
+            </select>
+          </div>
+
+          <div class="row">
+            <label>Height ({{ form.get('sizeUnit')?.value }})</label>
+            <input type="number" formControlName="jobSizeHeight"
+              [readonly]="isViewMode" step="0.01" min="0">
+          </div>
+
+          <div class="row">
+            <label>Width ({{ form.get('sizeUnit')?.value }})</label>
+            <input type="number" formControlName="jobSizeWidth"
+              [readonly]="isViewMode" step="0.01" min="0">
+          </div>
+
+          <div class="row">
+            <label>Margin ({{ form.get('sizeUnit')?.value }})</label>
+            <input type="number" formControlName="marginSize"
+              [readonly]="isViewMode" step="0.01" min="0">
+          </div>
+
+          <!--<div class="row">
+            <label>Materials by HP</label>
+            <div class="radio-group">
+              <label><input type="radio" [value]="true" formControlName="hpMaterial"
+                [attr.disabled]="isViewMode ? true : null"> Yes</label>
+              <label><input type="radio" [value]="false" formControlName="hpMaterial"
+                [attr.disabled]="isViewMode ? true : null"> No</label>
+            </div>
+          </div>-->
+
+          <!-- MATERIALS -->
+          <div class="section-label">Materials</div>
+
+          <div class="row">
+            <label>Material</label>
+            <select formControlName="pagesMaterialId"
+              [attr.disabled]="isViewMode ? true : null">
+              <option value="">None</option>
+              <option *ngFor="let m of materials" [value]="m.sid">
+                {{ m.name }} ({{ m.width }}"×{{ m.height }}" — LKR {{ m.costPerUnit }}/sheet)
+              </option>
+            </select>
+          </div>
+
+          <!-- COLOUR -->
+          <div class="section-label">Colour</div>
+
+          <div class="colour-block">
+            <div class="colour-title">
+              {{ form.get('jobType')?.value === 'book' ? 'Pages (Inside)' : 'Leaflet' }}
+            </div>
+            <div class="colour-row">
+              <span class="colour-side">Front</span>
+              <div class="radio-group">
+                <label><input type="radio" value="none" formControlName="pagesFrontColor"
+                  [attr.disabled]="isViewMode ? true : null"> None</label>
+                <label><input type="radio" value="1" formControlName="pagesFrontColor"
+                  [attr.disabled]="isViewMode ? true : null"> 1 Color</label>
+                <label><input type="radio" value="4" formControlName="pagesFrontColor"
+                  [attr.disabled]="isViewMode ? true : null"> 4 Color</label>
+              </div>
+            </div>
+            <div class="colour-row">
+              <span class="colour-side">Back</span>
+              <div class="radio-group">
+                <label><input type="radio" value="none" formControlName="pagesBackColor"
+                  [attr.disabled]="isViewMode ? true : null"> None</label>
+                <label><input type="radio" value="1" formControlName="pagesBackColor"
+                  [attr.disabled]="isViewMode ? true : null"> 1 Color</label>
+                <label><input type="radio" value="4" formControlName="pagesBackColor"
+                  [attr.disabled]="isViewMode ? true : null"> 4 Color</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="colour-block" *ngIf="form.get('jobType')?.value === 'book'">
+            <div class="colour-title">Cover</div>
+            <div class="colour-row">
+              <span class="colour-side">Front</span>
+              <div class="radio-group">
+                <label><input type="radio" value="none" formControlName="coverFrontColor"
+                  [attr.disabled]="isViewMode ? true : null"> None</label>
+                <label><input type="radio" value="1" formControlName="coverFrontColor"
+                  [attr.disabled]="isViewMode ? true : null"> 1 Color</label>
+                <label><input type="radio" value="4" formControlName="coverFrontColor"
+                  [attr.disabled]="isViewMode ? true : null"> 4 Color</label>
+              </div>
+            </div>
+            <div class="colour-row">
+              <span class="colour-side">Back</span>
+              <div class="radio-group">
+                <label><input type="radio" value="none" formControlName="coverBackColor"
+                  [attr.disabled]="isViewMode ? true : null"> None</label>
+                <label><input type="radio" value="1" formControlName="coverBackColor"
+                  [attr.disabled]="isViewMode ? true : null"> 1 Color</label>
+                <label><input type="radio" value="4" formControlName="coverBackColor"
+                  [attr.disabled]="isViewMode ? true : null"> 4 Color</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- FINISHING -->
+          <div class="section-label">Finishing</div>
+
+          <!-- Laminate: unique names only, auto-picks size by job dimensions -->
+          <div class="lam-row">
+            <label class="lam-label">Laminate</label>
+            <div class="lam-options">
+              <div class="radio-group wrap">
+                <label>
+                  <input type="radio"
+                    [checked]="selectedLaminationName === 'none'"
+                    (change)="onLaminationNameChange('none')"
+                    [attr.disabled]="isViewMode ? true : null">
+                  None
+                </label>
+                <label *ngFor="let name of uniqueLaminationNames">
+                  <input type="radio"
+                    [checked]="selectedLaminationName === name"
+                    (change)="onLaminationNameChange(name)"
+                    [attr.disabled]="isViewMode ? true : null">
+                  {{ name }}
+                </label>
+              </div>
+              <div class="lam-info" *ngIf="selectedLaminationInfo">
+                <small class="tag size-hint">Auto-selected: {{ selectedLaminationInfo }}</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="row" *ngIf="form.get('jobType')?.value === 'book'">
+            <label>Binding</label>
+            <div class="radio-group wrap">
+              <label><input type="radio"
+                [checked]="selectedBindingName === 'none'"
+                (change)="onBindingNameChange('none')"
+                [attr.disabled]="isViewMode ? true : null"> None</label>
+              <label *ngFor="let name of uniqueBindingNames">
+                <input type="radio"
+                  [checked]="selectedBindingName === name"
+                  (change)="onBindingNameChange(name)"
+                  [attr.disabled]="isViewMode ? true : null">
+                {{ name }}
+              </label>
+              <small class="tag" *ngIf="selectedBindingInfo">Auto-selected: {{ selectedBindingInfo }}</small>
+            </div>
+          </div>
+
+          <!-- PRICING -->
+          <div class="section-label">Pricing</div>
+
+          <div class="row">
+            <label>Extra Charges</label>
+            <div class="pct-row">
+              <input type="number" formControlName="extraChargesPct"
+                class="pct-input" [readonly]="isViewMode" min="0" max="100">
+              <span class="pct-sign">%</span>
+            </div>
+          </div>
+
+          <div class="row">
+            <label>Profit Margin</label>
+            <div class="pct-row">
+              <input type="number" formControlName="profitMarginPct"
+                class="pct-input" [readonly]="isViewMode" min="0" max="100">
+              <span class="pct-sign">%</span>
+            </div>
+          </div>
+
+          <div class="button-row" *ngIf="!isViewMode">
+            <button type="button" class="submit-btn" (click)="viewQuotation()">
+              VIEW QUOTATION
+            </button>
+          </div>
+
+          <div class="button-row" *ngIf="isViewMode">
+            <button type="button" class="save-btn" *ngIf="!isJobQuotationView"
+              (click)="saveQuotation()" [disabled]="isSaving">
+              {{ isSaving ? 'Saving...' : 'SAVE QUOTATION' }}
+            </button>
+            <button type="button" class="download-btn" *ngIf="quotation?.id"
+              (click)="downloadQuotation()" [disabled]="downloadingPdf()">
+              {{ downloadingPdf() ? 'DOWNLOADING...' : 'DOWNLOAD PDF' }}
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- ── RIGHT: Cutting View + Cost Breakdown ─────────── -->
+      <div class="right-panel">
+
+        <div class="cutting-panel">
+          <div class="panel-title">Cutting Layout</div>
+
+          <div class="cutting-hint"
+            *ngIf="!form.get('pagesMaterialId')?.value || !form.get('jobSizeHeight')?.value">
+            Select a material and enter job size to see cutting layout.
+          </div>
+
+          <div class="cutting-info" *ngIf="cuttingResult.piecesPerSheet > 0">
+            <div class="info-row">
+              <span>Pieces per sheet</span>
+              <strong>{{ cuttingResult.piecesPerSheet }}</strong>
+            </div>
+            <div class="info-row">
+              <span>Main grid</span>
+              <strong>{{ cuttingResult.cols }} × {{ cuttingResult.rows }}</strong>
+            </div>
+            <div class="info-row" *ngIf="cuttingResult.extraPieces > 0">
+              <span>Strip pieces</span>
+              <strong class="extra-tag">+{{ cuttingResult.extraPieces }}</strong>
+            </div>
+            <div class="info-row" *ngIf="cuttingResult.rotated">
+              <span>Orientation</span>
+              <strong class="rotated-tag">Rotated ↻</strong>
+            </div>
+            <div class="info-row"
+              *ngIf="form.get('jobType')?.value === 'book' && ((form.get('pagesQty')?.value ?? 0) > 0)">
+              <span>Sheets per book</span>
+              <strong>{{ cuttingResult.sheetsPerBook }}</strong>
+            </div>
+            <div class="info-row">
+              <span>Total sheets needed</span>
+              <strong>{{ cuttingResult.sheetsNeeded }}</strong>
+            </div>
+          </div>
+
+          <!-- VISUAL CUTTING GRID -->
+          <div class="cutting-box" *ngIf="cuttingResult.piecesPerSheet > 0">
+
+            <!-- Sheet wrapper: main grid + optional right strip side by side,
+                 or main grid + bottom strip stacked -->
+            <div class="sheet-wrapper"
+              [class.has-right-strip]="cuttingResult.extraPieces > 0 && cuttingResult.extraIsRight"
+              [class.has-bottom-strip]="cuttingResult.extraPieces > 0 && !cuttingResult.extraIsRight">
+
+              <!-- MAIN GRID -->
+              <div class="main-grid"
+                [style.grid-template-columns]="'repeat(' + cuttingResult.cols + ', 1fr)'">
+                <div class="cut-piece" *ngFor="let i of cuttingGrid">
+                  <div class="cut-inner"></div>
+                </div>
+              </div>
+
+              <!-- RIGHT STRIP -->
+              <div class="extra-strip strip-right"
+                *ngIf="cuttingResult.extraPieces > 0 && cuttingResult.extraIsRight">
+                <div class="strip-grid"
+                  [style.grid-template-columns]="'repeat(' + cuttingResult.extraCols + ', 1fr)'">
+                  <div class="cut-piece cut-piece-extra" *ngFor="let i of extraGrid">
+                    <div class="cut-inner-extra"></div>
+                  </div>
+                </div>
+                <div class="strip-count">+{{ cuttingResult.extraPieces }}</div>
+              </div>
+
+            </div>
+
+            <!-- BOTTOM STRIP (below main grid) -->
+            <div class="extra-strip strip-bottom"
+              *ngIf="cuttingResult.extraPieces > 0 && !cuttingResult.extraIsRight">
+              <div class="strip-grid"
+                [style.grid-template-columns]="'repeat(' + cuttingResult.extraCols + ', 1fr)'">
+                <div class="cut-piece cut-piece-extra" *ngFor="let i of extraGrid">
+                  <div class="cut-inner-extra"></div>
+                </div>
+              </div>
+              <div class="strip-count">+{{ cuttingResult.extraPieces }}</div>
+            </div>
+
+          </div>
+          <!-- ARTWORK FILES -->
+<div class="artwork-panel">
+  <div class="panel-title">Artwork Files</div>
+
+  <div class="artwork-upload" *ngIf="!isJobQuotationView">
+    <input type="file" accept=".jpg,.jpeg,.png,.pdf"
+      (change)="onFileSelected($event)" [disabled]="uploading() || isSaving">
+    <span *ngIf="uploading()" class="uploading-hint">Uploading...</span>
+  </div>
+
+  <div class="artwork-list" *ngIf="pendingArtworkFiles.length > 0 || artworks().length > 0">
+    <div class="artwork-item" *ngFor="let file of pendingArtworkFiles; let i = index">
+      <span>{{ file.name }}</span>
+      <small class="tag">Pending</small>
+      <button *ngIf="!isJobQuotationView" type="button" class="remove-btn" (click)="removePendingArtwork(i)">✕</button>
+    </div>
+    <div class="artwork-item" *ngFor="let a of artworks()">
+      <a [href]="fileUrl(a.file_path)" target="_blank">{{ a.file_name }}</a>
+      <button *ngIf="!isJobQuotationView" type="button" class="remove-btn" (click)="deleteArtwork(a)">✕</button>
+    </div>
+  </div>
+  <p class="artwork-empty" *ngIf="pendingArtworkFiles.length === 0 && artworks().length === 0">No files uploaded yet.</p>
+</div>
+        </div>
+
+        <!-- COST BREAKDOWN -->
+        <div class="cost-panel" *ngIf="costBreakdown">
+          <div class="panel-title">Cost Breakdown</div>
+
+          <div class="breakdown-row" *ngIf="form.get('jobType')?.value === 'book'">
+            <span>Sheets/book ({{ form.get('pagesQty')?.value }} pages)</span>
+            <span>{{ cuttingResult.sheetsPerBook }}</span>
+          </div>
+          <div class="breakdown-row">
+            <span>Material ({{ cuttingResult.sheetsNeeded }} sheets)</span>
+            <span>LKR {{ costBreakdown.materialCost | number:'1.2-2' }}</span>
+          </div>
+          <div class="breakdown-row">
+            <span>Printing</span>
+            <span>LKR {{ costBreakdown.printingCost | number:'1.2-2' }}</span>
+          </div>
+          <div class="breakdown-row" *ngIf="costBreakdown.bindingCost > 0">
+            <span>Binding</span>
+            <span>LKR {{ costBreakdown.bindingCost | number:'1.2-2' }}</span>
+          </div>
+          <div class="breakdown-row" *ngIf="costBreakdown.laminationCost > 0">
+            <span>Lamination</span>
+            <span>LKR {{ costBreakdown.laminationCost | number:'1.2-2' }}</span>
+          </div>
+          <div class="breakdown-row subtotal">
+            <span>Base Cost</span>
+            <span>LKR {{ costBreakdown.base | number:'1.2-2' }}</span>
+          </div>
+          <div class="breakdown-row">
+            <span>Extra Charges ({{ form.get('extraChargesPct')?.value }}%)</span>
+            <span>LKR {{ (costBreakdown.withExtra - costBreakdown.base) | number:'1.2-2' }}</span>
+          </div>
+          <div class="breakdown-row">
+            <span>Profit Margin ({{ form.get('profitMarginPct')?.value }}%)</span>
+            <span>LKR {{ (costBreakdown.total - costBreakdown.withExtra) | number:'1.2-2' }}</span>
+          </div>
+          <div class="breakdown-row total-row">
+            <span>TOTAL</span>
+            <strong>LKR {{ costBreakdown.total | number:'1.2-2' }}</strong>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-actions">
+    <button class="back-btn" (click)="goBack()">← Back</button>
+  </div>
+</div>

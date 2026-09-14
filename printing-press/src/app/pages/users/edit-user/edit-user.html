@@ -1,0 +1,37 @@
+<div class="user-form-page">
+  <div class="page-header">
+    <div>
+      <a routerLink="/users" class="back-link">User Management</a>
+      <h1>Edit User</h1>
+      <p>Update role and account status.</p>
+    </div>
+  </div>
+
+  <p *ngIf="loading()">Loading...</p>
+  <p class="error-box" *ngIf="error()">{{ error() }}</p>
+
+  <form class="form-card" [formGroup]="form" (ngSubmit)="save()" *ngIf="!loading()">
+    <div class="form-grid">
+      <label>Full Name <input type="text" formControlName="full_name"></label>
+      <label>Email <input type="email" formControlName="email"></label>
+      <label>Role
+        <select formControlName="role_id">
+          <option *ngFor="let r of roles" [value]="r.id">{{ r.name }}</option>
+        </select>
+      </label>
+      <label>Status
+        <select formControlName="is_active">
+          <option [ngValue]="true">Active</option>
+          <option [ngValue]="false">Inactive</option>
+        </select>
+      </label>
+    </div>
+    <div class="form-actions">
+      <a routerLink="/users" class="secondary-btn">Cancel</a>
+      <button type="button" class="danger-btn" (click)="deactivate()" [disabled]="isSelf()">Deactivate</button>
+      <button type="submit" class="primary-btn" [disabled]="saving()">
+        {{ saving() ? 'Saving...' : 'Update User' }}
+      </button>
+    </div>
+  </form>
+</div>

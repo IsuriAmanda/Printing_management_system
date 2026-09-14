@@ -1,0 +1,55 @@
+<div class="operators-page">
+  <div class="page-header">
+    <div>
+      <a routerLink="/jobs" class="back-link">Job List</a>
+      <h1>Machine Operators</h1>
+      <p>Manage machine availability and daily operator assignments.</p>
+    </div>
+    <label class="date-picker">
+      Date
+      <input type="date" [ngModel]="selectedDate()" [max]="today" (ngModelChange)="onDateChange($event)">
+    </label>
+  </div>
+
+  <p *ngIf="loading()">Loading...</p>
+  <p class="error-box" *ngIf="error()">{{ error() }}</p>
+
+  <div class="table-wrapper" *ngIf="!loading() && !error()">
+    <table class="operators-table">
+      <thead>
+        <tr>
+          <th>Machine</th>
+          <th>Status</th>
+          <th>Current Operator</th>
+          <th>Assign Operator</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of rows()" [class.inactive-row]="!isActive(row)">
+          <td>{{ row.machine_name }}</td>
+          <td>
+            <select
+              class="status-select"
+              [class.inactive]="!isActive(row)"
+              [ngModel]="isActive(row) ? '1' : '0'"
+              (ngModelChange)="toggleMachineStatus(row, $event)"
+              [disabled]="saving() === row.machine_id">
+              <option value="1">Active</option>
+              <option value="0">Not working</option>
+            </select>
+          </td>
+          <td>{{ isActive(row) ? (row.operator_name || '- none -') : 'Unavailable' }}</td>
+          <td>
+            <select
+              [ngModel]="row.user_id"
+              (ngModelChange)="assign(row, $event)"
+              [disabled]="saving() === row.machine_id || !isActive(row)">
+              <option [ngValue]="null" disabled>Select operator</option>
+              <option *ngFor="let op of operators()" [value]="op.id">{{ op.full_name }}</option>
+            </select>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
