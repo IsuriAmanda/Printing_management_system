@@ -1,0 +1,193 @@
+// ── Create Quotation Page Container ──────────────────────────
+.quotation-page {
+  padding: 20px 40px;
+
+  // ── Page Header Title ──────────────────────────────────────
+  .page-title {
+    text-align: center;
+    font-size: 20px;
+    color: #6e746e;
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+
+  // ── Central Form Wrapper Box ───────────────────────────────
+  .quotation-box {
+    max-width: 780px;
+    margin: 0 auto;
+    background: #e9e6ea;
+    border-radius: 20px;
+    padding: 30px 45px;
+    box-sizing: border-box;
+
+    .form-area {
+      display: flex;
+      flex-direction: column;
+    }
+
+    // ── Subsection Typography ────────────────────────────────
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #6f756f;
+      margin: 10px 0 15px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    // ── Mode Switch Tab Buttons ──────────────────────────────
+    .mode-toggle {
+      display: flex;
+      gap: 0;
+      margin-bottom: 20px;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid #ccc;
+
+      button {
+        flex: 1;
+        height: 34px;
+        border: none;
+        background: #fff;
+        font-size: 11px;
+        font-weight: 500;
+        color: #666;
+        cursor: pointer;
+        transition: all 0.15s ease;
+
+        &.active {
+          background: #2d7a1f;
+          color: #fff;
+        }
+
+        &:not(.active):hover {
+          background: #f0f0f0;
+        }
+      }
+    }
+
+    // ── Structural Form Rows ─────────────────────────────────
+    .form-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+      gap: 12px;
+
+      label {
+        width: 190px;
+        font-size: 13px;
+        color: #6f756f;
+        flex-shrink: 0;
+
+        .req {
+          color: #dc3545;
+          margin-left: 2px;
+        }
+      }
+
+      // Input fields and Select dropdown fields
+      input[type="text"],
+      input[type="email"],
+      select {
+        flex: 1;
+        height: 30px;
+        border-radius: 6px;
+        border: none;
+        background: #f4f4f4;
+        padding: 0 10px;
+        font-size: 12px;
+        outline: none;
+        transition: background 0.2s, border-color 0.2s;
+        box-sizing: border-box;
+
+        &:focus {
+          background: #fff;
+          box-shadow: 0 0 0 2px rgba(45, 122, 31, 0.2);
+        }
+      }
+
+      // Explicit overrides for the customer select field element
+      .customer-select {
+        border: 1px solid #ddd;
+        background: #fff;
+
+        &:focus {
+          border-color: #2d7a1f;
+        }
+      }
+    }
+
+    // ── Asynchronous State Label ─────────────────────────────
+    .loading-text {
+      text-align: center;
+      color: #888;
+      font-size: 12px;
+      padding: 16px;
+    }
+
+    // ── Selected Customer Profile Preview ────────────────────
+    .customer-preview {
+      background: #fff;
+      border-radius: 6px;
+      padding: 12px 14px;
+      margin: 10px 0 15px;
+      border: 1px solid #e0dde0;
+
+      .preview-row {
+        display: flex;
+        gap: 12px;
+        padding: 5px 0;
+        border-bottom: 1px solid #f0edf0;
+        font-size: 12px;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        span {
+          width: 60px;
+          color: #888;
+        }
+
+        strong {
+          color: #333;
+          font-weight: 600;
+        }
+      }
+    }
+
+    // ── Footer Action Button Layout ──────────────────────────
+    .button-area {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+
+      .submit-btn {
+        background: #1f6b0a;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 10px 40px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+
+        &:hover {
+          background: #195707;
+        }
+
+        &:disabled {
+          background: #aaa;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+}
+.validation-error {
+  display: block;
+  margin-top: 5px;
+  color: #b42318;
+  font-size: 0.8rem;
+}

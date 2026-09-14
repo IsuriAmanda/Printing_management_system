@@ -1,0 +1,126 @@
+<div class="quotation-page">
+  <div class="quotation-box">
+
+    <div class="page-title">Create Quotation</div>
+
+    <form [formGroup]="form">
+      <div class="form-area">
+
+        <!-- MODE TOGGLE -->
+        <div class="mode-toggle">
+          <button
+            type="button"
+            [class.active]="mode === 'existing'"
+            (click)="switchMode('existing')">
+            Existing Customer
+          </button>
+          <button
+            type="button"
+            [class.active]="mode === 'new'"
+            (click)="switchMode('new')">
+            New Customer
+          </button>
+        </div>
+
+        <!-- EXISTING CUSTOMER -->
+        <ng-container *ngIf="mode === 'existing'">
+
+          <div class="section-title">Select Customer</div>
+
+          <div *ngIf="isLoadingCustomers" class="loading-text">
+            Loading customers...
+          </div>
+
+          <div class="form-row" *ngIf="!isLoadingCustomers">
+            <label>Customer</label>
+            <select formControlName="customerId" class="customer-select">
+              <option [value]="null">— Select a customer —</option>
+              <option
+                *ngFor="let c of customers"
+                [value]="c.customer_id">
+                {{ c.name }}
+                <ng-container *ngIf="c.phone"> · {{ c.phone }}</ng-container>
+              </option>
+            </select>
+          </div>
+
+          <!-- Show selected customer details -->
+          <div class="customer-preview"
+            *ngIf="form.get('customerId')?.value">
+            <ng-container *ngFor="let c of customers">
+              <ng-container *ngIf="c.customer_id === +form.get('customerId')!.value">
+                <div class="preview-row">
+                  <span>Name</span>
+                  <strong>{{ c.name }}</strong>
+                </div>
+                <div class="preview-row" *ngIf="c.phone">
+                  <span>Phone</span>
+                  <strong>{{ c.phone }}</strong>
+                </div>
+                <div class="preview-row" *ngIf="c.email">
+                  <span>Email</span>
+                  <strong>{{ c.email }}</strong>
+                </div>
+                <div class="preview-row" *ngIf="c.status">
+                  <span>Status</span>
+                  <strong>{{ c.status }}</strong>
+                </div>
+                <div class="preview-row" *ngIf="c.address">
+                  <span>Address</span>
+                  <strong>{{ c.address }}</strong>  
+                </div>
+              </ng-container>
+            </ng-container>
+          </div>
+
+        </ng-container>
+
+        <!-- NEW CUSTOMER -->
+        <ng-container *ngIf="mode === 'new'">
+
+          <div class="section-title">New Customer Details</div>
+
+          <div class="form-row">
+            <label>Customer Name <span class="req">*</span></label>
+            <input type="text" formControlName="customerName"
+              placeholder="Full name or company">
+          </div>
+
+          <div class="form-row">
+            <label>Telephone No</label>
+            <input type="text" formControlName="phoneNumber"
+              placeholder="07X XXX XXXX">
+          </div>
+
+          <div class="form-row">
+            <label>Email</label>
+            <input type="email" formControlName="email"
+              placeholder="email@example.com">
+            <small class="validation-error"
+              *ngIf="form.get('email')?.touched && form.get('email')?.hasError('email')">
+              Enter a valid email address, for example name@example.com.
+            </small>
+          </div>
+          <div class="form-row">
+            <label>Address</label>
+             <input type="text" formControlName="address"
+              placeholder="Address">
+          </div>
+
+        </ng-container>
+
+        <!-- SUBMIT -->
+        <div class="button-area">
+          <button
+            class="submit-btn"
+            type="button"
+            (click)="submit()"
+            [disabled]="isSubmitting">
+            {{ isSubmitting ? 'Creating...' : 'NEXT →' }}
+          </button>
+        </div>
+
+      </div>
+    </form>
+  </div>
+</div>
