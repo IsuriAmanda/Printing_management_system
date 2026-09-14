@@ -1,0 +1,11 @@
+<app-dashboard-overview
+  *ngIf="
+    currentUser?.role !== 'Operator'
+  ">
+</app-dashboard-overview>
+
+<app-operator-dashboard
+  *ngIf="
+    currentUser?.role === 'Operator'
+  ">
+</app-operator-dashboard>

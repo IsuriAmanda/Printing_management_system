@@ -1,0 +1,60 @@
+<div class="notifications-page">
+
+  <div class="page-header">
+
+    <div class="page-title">
+      Notifications
+    </div>
+
+    <button class="mark-btn">
+      Mark All Read
+    </button>
+
+  </div>
+
+  <!-- LIST -->
+
+  <div class="notification-list">
+
+    <div
+      class="notification-card"
+      *ngFor="let item of notifications"
+      [class.unread]="item.unread">
+
+      <!-- ICON -->
+
+      <div class="icon-area">
+
+        <div
+          class="status-dot"
+          [class.red]="item.type === 'quotation'"
+          [class.yellow]="item.type === 'warning'"
+          [class.green]="item.type === 'success'"
+          [class.blue]="item.type === 'info'">
+        </div>
+
+      </div>
+
+      <!-- CONTENT -->
+
+      <div class="content-area">
+
+        <div class="title">
+          {{ item.title }}
+        </div>
+
+        <div class="message">
+          {{ item.message }}
+        </div>
+
+        <div class="time">
+          {{ item.time }}
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
