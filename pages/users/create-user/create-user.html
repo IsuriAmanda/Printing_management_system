@@ -1,0 +1,55 @@
+<div class="user-form-page">
+  <div class="page-header">
+    <div>
+      <a routerLink="/users" class="back-link">User Management</a>
+      <h1>Create User</h1>
+      <p>Add a new system user and assign the correct role.</p>
+    </div>
+  </div>
+
+  <form class="form-card">
+    <div class="form-grid">
+      <label>
+        Full Name
+        <input type="text" placeholder="Enter full name" [(ngModel)]="user.fullName" name="fullName">
+      </label>
+
+      <label>
+        Email
+        <input type="email" placeholder="name@harshanaprinters.lk" [(ngModel)]="user.email" name="email">
+      </label>
+
+      <label>
+        Phone
+        <input type="tel" placeholder="07X XXX XXXX" [(ngModel)]="user.phone" name="phone">
+      </label>
+
+      <label>
+        Role
+        <select [(ngModel)]="user.role" name="role">
+          <option *ngFor="let role of roles">{{ role }}</option>
+        </select>
+      </label>
+
+      <label>
+        Status
+        <select [(ngModel)]="user.status" name="status">
+          <option>Active</option>
+          <option>Inactive</option>
+        </select>
+      </label>
+
+      <label class="full-width">
+        Temporary Password
+        <input type="password" placeholder="Set temporary password" [(ngModel)]="user.temporaryPassword" name="temporaryPassword">
+      </label>
+    </div>
+
+    <div class="form-actions">
+      <a routerLink="/users" class="secondary-btn">Cancel</a>
+      <button type="button" class="primary-btn" (click)="saveUser()">
+  Save User
+</button>
+    </div>
+  </form>
+</div>
